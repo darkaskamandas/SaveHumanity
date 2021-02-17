@@ -1,0 +1,216 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Solution {
+
+   struct CompToken
+        {
+            public Char c;
+            public int count;
+
+            public CompToken(Char car, int cnt = 1) {
+                c = car;
+                count = cnt;
+            }
+        }
+    /*
+     * Complete the virusIndices function below.
+     */
+    static void virusIndices(string s, string v) {
+        /*
+         * Print the answer for this test case in a single line
+         */
+         
+      
+       
+              if(v.Length > s.Length)
+            {
+                Console.WriteLine("No Match!");
+                return;
+            }
+
+            List<int> indices = new List<int>(100000);
+
+            CompToken[] sTokens = new CompToken[s.Length];
+            CompToken[] virTokens = new CompToken[v.Length];
+
+            int nextIndex = 0;
+            for(int i  = 0; i < s.Length;)
+            {
+                
+                CompToken cToken = new CompToken(s[i++]);
+                while (i < s.Length && s[i] == cToken.c)
+                {
+                    cToken.count += 1;
+                    i++;
+                }
+
+                sTokens[nextIndex++] = cToken;
+            }
+
+            int vNextIndex = 0;
+            for (int i = 0; i < v.Length;)
+            {
+
+                CompToken cToken = new CompToken(v[i++]);
+                while (i < v.Length && v[i] == cToken.c)
+                {
+                    cToken.count += 1;
+                    i++;
+                }
+
+                virTokens[vNextIndex++] = cToken;
+            }
+
+            int diff = 0;
+
+            int nextI = 0;
+            int vL = v.Length;
+              
+            int vOffset = 0;
+            int sIndex = 0;
+            int sEnd = sTokens[0].count;
+            
+            while ((nextI + vL) <= s.Length)
+            {
+                
+                diff = 0;                
+                int vIndex = 0;
+                int k = 0;
+           
+                int stillToMatchS = 0;
+                int stillToMatchV = 0;
+                int firstMiss = 0;
+
+                vOffset = 0;
+   
+                CompToken curVtoken = virTokens[vIndex];
+                stillToMatchV = curVtoken.count;
+
+                int temp = nextI;
+              
+                while(true)
+                {            
+                    if(nextI >= sEnd) { 
+ 
+                        sIndex++;
+                        sEnd += sTokens[sIndex].count;
+                    }
+                    else                                        
+                        break;
+                    
+                }
+
+                CompToken curStoken = sTokens[sIndex];
+                stillToMatchS = sEnd - nextI; 
+
+                while (stillToMatchV > 0 && (sIndex + k < nextIndex)) 
+                {
+                  
+                    if (curStoken.c == curVtoken.c)
+                    {
+                        if (stillToMatchS < stillToMatchV) 
+                        {
+                            vOffset += stillToMatchS;                     
+                            stillToMatchV -= stillToMatchS;
+                            stillToMatchS = 0;                                        
+                        }
+                        else
+                        {
+                            vOffset += stillToMatchV;                          
+                            stillToMatchS -= stillToMatchV;
+                            stillToMatchV = 0;                        
+                        }
+                    }
+                    else
+                    {
+                       
+                        diff++;
+                        
+                        if (diff > 1)
+                        {
+                            //compute nextI.........? or just move one ahead
+                            nextI++;
+                            break;
+                        }
+                        else
+                        {
+                            firstMiss = vOffset + nextI;
+                            stillToMatchS--;
+                            stillToMatchV--;
+                            vOffset++;
+                            
+                        }
+                    }
+
+
+                  
+                    if (stillToMatchV <= 0)
+                    {
+                    
+                        vIndex++;
+                        if (vIndex >= vNextIndex)
+                            break;
+                        curVtoken = virTokens[vIndex];
+                        stillToMatchV = curVtoken.count;
+                    }
+
+                    if (stillToMatchS <= 0)
+                    {
+                        k++;
+                        
+                        curStoken = sTokens[sIndex + k];
+                        stillToMatchS = curStoken.count;
+                       
+
+                    }
+ 
+                } 
+
+                if(diff <= 1)
+                {
+
+                    indices.Add(nextI);
+                    nextI++;
+
+                }
+
+
+            }
+
+            if (indices.Count > 0)
+            {
+
+                System.Text.StringBuilder sb = new System.Text.StringBuilder(indices.Count * 7);            
+                for (int j = 0; j < indices.Count; j++)
+                {
+                  
+                    sb.Append(indices[j]);
+                    sb.Append(" ");
+                }
+
+
+                Console.WriteLine(sb.ToString());// result);
+            }
+            else
+                Console.WriteLine("No Match!");
+        
+       
+    }
+
+    static void Main(string[] args) {
+        int t = Convert.ToInt32(Console.ReadLine());
+
+        for (int tItr = 0; tItr < t; tItr++) {
+            string[] pv = Console.ReadLine().Split(' ');
+
+            string p = pv[0];
+
+            string v = pv[1];
+
+            virusIndices(p, v);
+        }
+    }
+}
